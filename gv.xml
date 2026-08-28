@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gameversions>
+  <gameversion version="1.7.10" name="Minecraft 1.7.10" resid="1710" url="https://yuyu107.github.io/mcpcbox-downloads/test/1.7.10.zip" versionType="2" md5="00000000000000000000000000000000" javaVersion="java7" />
+  <gameversion version="1.8.9" name="Minecraft 1.8.9" resid="1890" url="https://yuyu107.github.io/mcpcbox-downloads/test/1.8.9.zip" versionType="2" md5="00000000000000000000000000000000" javaVersion="java8" />
+</gameversions>
