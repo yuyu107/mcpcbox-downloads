@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>联机大厅</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<style>
+html,body{margin:0;padding:0;background:#151515;color:#cfcfcf;font-family:"Microsoft YaHei",Arial,sans-serif;font-size:14px;}
+.wrap{padding:26px 34px;}
+.title{font-size:22px;color:#f0f0f0;margin-bottom:8px;}
+.sub{color:#858585;margin-bottom:24px;line-height:1.8;}
+.card{background:#202020;border:1px solid #2b2b2b;padding:20px;margin-bottom:16px;}
+.card h2{font-size:17px;color:#e6e6e6;margin:0 0 10px 0;font-weight:normal;}
+.card p{margin:6px 0;color:#9a9a9a;line-height:1.8;}
+.btn{display:inline-block;margin-top:12px;padding:9px 22px;border:1px solid #18a33a;color:#eaffee;text-decoration:none;background:#159431;}
+.btn:hover{background:#19aa39;}
+.note{margin-top:22px;padding-top:16px;border-top:1px solid #292929;color:#666;line-height:1.8;}
+.status{color:#49c967;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">联机大厅</div>
+  <div class="sub">社区修复测试页面。原官方服务器大厅接口已经停止工作，当前先恢复盒子原有的联机版本下载与管理入口。</div>
+
+  <div class="card">
+    <h2>联机版本</h2>
+    <p>服务器客户端原本会下载到盒子的“联机版本”区域。</p>
+    <p>点击下面按钮，测试网页能否调用盒子原有的联机版本跳转功能。</p>
+    <a class="btn" href="mcpcbox://jump_online=^0^">打开联机版本</a>
+  </div>
+
+  <div class="card">
+    <h2>服务器大厅恢复进度</h2>
+    <p><span class="status">第一阶段：</span>恢复大厅页面和客户端跳转。</p>
+    <p>后续再接入可用的服务器客户端列表、下载信息和版本管理。</p>
+  </div>
+
+  <div class="note">此页面不依赖旧多玩账号登录。当前版本仅用于测试联机大厅与盒子本体之间的调用是否仍然可用。</div>
+</div>
+</body>
+</html>
