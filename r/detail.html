@@ -9,29 +9,30 @@ html,body{margin:0;padding:0;background:#151515;color:#ccc;font-family:"Microsof
 <script>
 function gid(){var m=location.search.match(/[?&]id=(\d+)/);return m?parseInt(m[1],10):1;}
 function log(s,cls){var e=document.getElementById('log');e.className='log '+(cls||'');e.innerText=s;}
-function callGlobal(name,arg){
-  try{
-    var f=window[name];
-    if(typeof f==='function') return {ok:true,where:'window.'+name,value:f(arg)};
-  }catch(e){return {ok:false,where:'window.'+name,error:e.message||String(e)};}
-  try{
-    if(window.external && typeof window.external[name]!=='undefined'){
-      return {ok:true,where:'window.external.'+name,value:window.external[name](arg)};
-    }
-  }catch(e2){return {ok:false,where:'window.external.'+name,error:e2.message||String(e2)};}
-  return {ok:false,where:'none',error:'未找到可调用接口'};
-}
 function checkBridge(){
-  var id=gid(),r=callGlobal('MCPCBox_CheckGameResIsExit',id);
-  if(r.ok){log('桥接成功\n调用位置：'+r.where+'\n资源 ID：'+id+'\n返回值：'+r.value,'ok');}
-  else{log('桥接失败\n尝试接口：MCPCBox_CheckGameResIsExit\n结果：'+r.error+'\n位置：'+r.where,'err');}
+  var id=gid();
+  try{
+    if(window.external && typeof window.external.MCPCBox_CheckGameResIsExit!=='undefined'){
+      var v=window.external.MCPCBox_CheckGameResIsExit(id);
+      log('桥接成功\n调用位置：window.external.MCPCBox_CheckGameResIsExit\n资源 ID：'+id+'\n返回值：'+v,'ok');
+      return;
+    }
+  }catch(e){log('桥接失败\n结果：'+(e.message||String(e)),'err');return;}
+  log('桥接失败\n未找到 MCPCBox_CheckGameResIsExit','err');
 }
 function testDownload(){
   var id=gid();
-  if(!confirm('这会测试调用 MCPCBox_DownloadGameRes('+id+')。\n如果 ID 有效，盒子可能会开始下载。是否继续？')) return;
-  var r=callGlobal('MCPCBox_DownloadGameRes',id);
-  if(r.ok){log('下载接口调用已提交\n调用位置：'+r.where+'\n资源 ID：'+id+'\n返回值：'+r.value,'ok');}
-  else{log('下载接口调用失败\n结果：'+r.error+'\n位置：'+r.where,'err');}
+  if(!confirm('将调用 MCPCBox_DownloadGameRes('+id+')。\n如果资源 ID 有效，盒子可能会开始下载。是否继续？')) return;
+  try{
+    if(window.external && typeof window.external.MCPCBox_DownloadGameRes!=='undefined'){
+      /* 重要：此 COM 方法的返回 VARIANT 是 IE JavaScript 不支持的 Automation 类型。
+         因此只执行调用，绝不读取/赋值返回值。 */
+      window.external.MCPCBox_DownloadGameRes(id);
+      log('下载接口调用已执行\n调用位置：window.external.MCPCBox_DownloadGameRes\n资源 ID：'+id+'\n返回值：未读取（避免 Automation 类型错误）\n\n请观察盒子的“下载管理”窗口是否出现任务。','ok');
+      return;
+    }
+  }catch(e){log('下载调用抛出异常\n结果：'+(e.message||String(e))+'\n\n如果“下载管理”已经弹出，说明原生调用实际上已经执行，只是 COM 返回值/后续处理产生异常。','err');return;}
+  log('下载接口调用失败\n未找到 MCPCBox_DownloadGameRes','err');
 }
 window.onload=function(){document.getElementById('rid').innerText=gid();};
 </script>
@@ -43,7 +44,7 @@ window.onload=function(){document.getElementById('rid').innerText=gid();};
  <div class="box">
   <div class="row"><span class="label">服务器状态：</span><span class="status">测试条目</span></div>
   <div class="row"><span class="label">客户端资源 ID：</span><span id="rid">1</span></div>
-  <div class="row warn">此条目暂时不是真实服务器，当前只用于确认旧盒子的网页 API 是否仍可调用。</div>
+  <div class="row warn">资源 ID 1 目前只是占位测试 ID。下载管理能弹出代表 DownloadGameRes 桥接已通，不代表这个 ID 存在真实客户端。</div>
   <button class="btn btn2" onclick="checkBridge()">检测客户端下载桥接</button>
   <button class="btn" onclick="testDownload()">测试下载调用</button>
   <div id="log" class="log">请先点击“检测客户端下载桥接”。</div>
