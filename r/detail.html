@@ -9,48 +9,34 @@ html,body{margin:0;padding:0;background:#151515;color:#ccc;font-family:"Microsof
 <script>
 function gid(){var m=location.search.match(/[?&]id=(\d+)/);return m?parseInt(m[1],10):2;}
 function log(s,cls){var e=document.getElementById('log');e.className='log '+(cls||'');e.innerText=s;}
-function checkBridge(){
+function checkResource(){
   var id=gid();
   try{
-    if(window.external && typeof window.external.MCPCBox_CheckGameResIsExit!=='undefined'){
-      var v=window.external.MCPCBox_CheckGameResIsExit(id);
-      log('桥接成功\n资源 ID：'+id+'\n返回值：'+v,'ok');return;
-    }
-  }catch(e){log('桥接失败\n结果：'+(e.message||String(e)),'err');return;}
-  log('桥接失败','err');
+    var v=window.external.MCPCBox_CheckGameResIsExit(id);
+    log('资源检测完成\n调用位置：window.external.MCPCBox_CheckGameResIsExit\n资源 ID：'+id+'\n返回值：'+v,'ok');
+  }catch(e){log('资源检测失败\n结果：'+(e.message||String(e)),'err');}
 }
-function protocolById(){
-  log('正在调用盒子协议：\nmcpcbox://download_pure_version=^2^\n\n请观察是否进入左下角“下载中心”，以及是否出现任务。','ok');
-  location.href='mcpcbox://download_pure_version=^2^';
-}
-function protocolByVersion(){
-  log('正在调用盒子协议：\nmcpcbox://download_pure_version=^OnlineClientTest^\n\n请观察是否进入左下角“下载中心”，以及是否出现任务。','ok');
-  location.href='mcpcbox://download_pure_version=^OnlineClientTest^';
-}
-function testOldDownload(){
+function downloadGame(){
   var id=gid();
-  if(!confirm('这会调用旧 MCPCBox_DownloadGameRes('+id+')，可能弹出旧下载管理窗口。是否继续？')) return;
   try{
     window.external.MCPCBox_DownloadGameRes(id);
-    log('旧下载接口调用已执行\n资源 ID：'+id+'\n返回值：未读取\n\n仅用于诊断。','ok');
-  }catch(e){log('旧下载接口调用异常\n结果：'+(e.message||String(e)),'err');}
+    log('原版下载接口已调用\n调用位置：window.external.MCPCBox_DownloadGameRes\n资源 ID：'+id+'\n返回值：未读取\n\n请观察原版下载管理是否出现任务。','ok');
+  }catch(e){log('下载接口调用异常\n结果：'+(e.message||String(e)),'err');}
 }
 window.onload=function(){document.getElementById('rid').innerText=gid();};
 </script>
 </head>
 <body>
 <div class="wrap">
- <a class="back" href="index.html?v=7">← 返回服务器列表</a>
- <div class="title">联机客户端协议测试</div>
+ <a class="back" href="index.html?v=8">← 返回服务器列表</a>
+ <div class="title">联机客户端测试服务器</div>
  <div class="box">
   <div class="row"><span class="label">客户端资源 ID：</span><span id="rid">2</span></div>
   <div class="row"><span class="label">版本标识：</span><span class="status">OnlineClientTest</span></div>
-  <div class="row warn">新版 window.external 接口未暴露给此网页，本轮改测盒子现有的 mcpcbox://download_pure_version 协议。</div>
-  <button class="btn btn2" onclick="checkBridge()">检测资源状态</button>
-  <button class="btn" onclick="protocolById()">协议 A：资源 ID 2</button>
-  <button class="btn" onclick="protocolByVersion()">协议 B：版本标识</button>
-  <button class="btn btn2" onclick="testOldDownload()">旧下载调用（诊断）</button>
-  <div id="log" class="log">先测试“协议 A：资源 ID 2”。</div>
+  <div class="row warn">本页只使用盒子原版联机客户端下载接口。本测试客户端只是一个很小的诊断文件。</div>
+  <button class="btn btn2" onclick="checkResource()">检测资源状态</button>
+  <button class="btn" onclick="downloadGame()">下载游戏</button>
+  <div id="log" class="log">建议先点击“检测资源状态”，再点击“下载游戏”。</div>
  </div>
 </div>
 </body>
