@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>服务器详情</title>
+<style>
+html,body{margin:0;padding:0;background:#151515;color:#ccc;font-family:"Microsoft YaHei",Arial,sans-serif;font-size:14px}.wrap{padding:24px 32px}.back{color:#52bd6b;text-decoration:none}.title{font-size:22px;color:#eee;margin:18px 0 8px}.box{background:#202020;border:1px solid #2d2d2d;padding:18px;margin-top:16px}.row{margin:8px 0;line-height:1.8}.label{color:#888}.status{color:#e4e4e4}.btn{display:inline-block;margin:10px 8px 0 0;padding:8px 18px;border:1px solid #1bad3f;background:#159431;color:#fff;cursor:pointer}.btn2{background:#252525}.log{margin-top:14px;padding:12px;background:#111;border:1px solid #292929;white-space:pre-wrap;word-break:break-all;color:#9f9f9f;min-height:54px}.warn{color:#d6a24e}.ok{color:#52bd6b}.err{color:#de6455}</style>
+<script>
+function gid(){var m=location.search.match(/[?&]id=(\d+)/);return m?parseInt(m[1],10):1;}
+function log(s,cls){var e=document.getElementById('log');e.className='log '+(cls||'');e.innerText=s;}
+function callGlobal(name,arg){
+  try{
+    var f=window[name];
+    if(typeof f==='function') return {ok:true,where:'window.'+name,value:f(arg)};
+  }catch(e){return {ok:false,where:'window.'+name,error:e.message||String(e)};}
+  try{
+    if(window.external && typeof window.external[name]!=='undefined'){
+      return {ok:true,where:'window.external.'+name,value:window.external[name](arg)};
+    }
+  }catch(e2){return {ok:false,where:'window.external.'+name,error:e2.message||String(e2)};}
+  return {ok:false,where:'none',error:'未找到可调用接口'};
+}
+function checkBridge(){
+  var id=gid(),r=callGlobal('MCPCBox_CheckGameResIsExit',id);
+  if(r.ok){log('桥接成功\n调用位置：'+r.where+'\n资源 ID：'+id+'\n返回值：'+r.value,'ok');}
+  else{log('桥接失败\n尝试接口：MCPCBox_CheckGameResIsExit\n结果：'+r.error+'\n位置：'+r.where,'err');}
+}
+function testDownload(){
+  var id=gid();
+  if(!confirm('这会测试调用 MCPCBox_DownloadGameRes('+id+')。\n如果 ID 有效，盒子可能会开始下载。是否继续？')) return;
+  var r=callGlobal('MCPCBox_DownloadGameRes',id);
+  if(r.ok){log('下载接口调用已提交\n调用位置：'+r.where+'\n资源 ID：'+id+'\n返回值：'+r.value,'ok');}
+  else{log('下载接口调用失败\n结果：'+r.error+'\n位置：'+r.where,'err');}
+}
+window.onload=function(){document.getElementById('rid').innerText=gid();};
+</script>
+</head>
+<body>
+<div class="wrap">
+ <a class="back" href="index.html">← 返回服务器列表</a>
+ <div class="title">联机客户端桥接测试</div>
+ <div class="box">
+  <div class="row"><span class="label">服务器状态：</span><span class="status">测试条目</span></div>
+  <div class="row"><span class="label">客户端资源 ID：</span><span id="rid">1</span></div>
+  <div class="row warn">此条目暂时不是真实服务器，当前只用于确认旧盒子的网页 API 是否仍可调用。</div>
+  <button class="btn btn2" onclick="checkBridge()">检测客户端下载桥接</button>
+  <button class="btn" onclick="testDownload()">测试下载调用</button>
+  <div id="log" class="log">请先点击“检测客户端下载桥接”。</div>
+ </div>
+</div>
+</body>
+</html>
