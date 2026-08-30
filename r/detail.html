@@ -7,47 +7,54 @@
 <style>
 html,body{margin:0;padding:0;background:#151515;color:#ccc;font-family:"Microsoft YaHei",Arial,sans-serif;font-size:14px}.wrap{padding:24px 32px}.back{color:#52bd6b;text-decoration:none}.title{font-size:22px;color:#eee;margin:18px 0 8px}.box{background:#202020;border:1px solid #2d2d2d;padding:18px;margin-top:16px}.row{margin:8px 0;line-height:1.8}.label{color:#888}.status{color:#e4e4e4}.btn{display:inline-block;margin:10px 8px 0 0;padding:8px 18px;border:1px solid #1bad3f;background:#159431;color:#fff;cursor:pointer}.btn2{background:#252525}.log{margin-top:14px;padding:12px;background:#111;border:1px solid #292929;white-space:pre-wrap;word-break:break-all;color:#9f9f9f;min-height:54px}.warn{color:#d6a24e}.ok{color:#52bd6b}.err{color:#de6455}</style>
 <script>
-function gid(){var m=location.search.match(/[?&]id=(\d+)/);return m?parseInt(m[1],10):1;}
+function gid(){var m=location.search.match(/[?&]id=(\d+)/);return m?parseInt(m[1],10):2;}
 function log(s,cls){var e=document.getElementById('log');e.className='log '+(cls||'');e.innerText=s;}
 function checkBridge(){
   var id=gid();
   try{
     if(window.external && typeof window.external.MCPCBox_CheckGameResIsExit!=='undefined'){
       var v=window.external.MCPCBox_CheckGameResIsExit(id);
-      log('桥接成功\n调用位置：window.external.MCPCBox_CheckGameResIsExit\n资源 ID：'+id+'\n返回值：'+v,'ok');
-      return;
+      log('桥接成功\n调用位置：window.external.MCPCBox_CheckGameResIsExit\n资源 ID：'+id+'\n返回值：'+v,'ok');return;
     }
   }catch(e){log('桥接失败\n结果：'+(e.message||String(e)),'err');return;}
   log('桥接失败\n未找到 MCPCBox_CheckGameResIsExit','err');
 }
-function testDownload(){
+function testNewDownload(){
+  try{
+    if(window.external && typeof window.external.MCPCBOX_VesionDownload!=='undefined'){
+      window.external.MCPCBOX_VesionDownload('OnlineClientTest');
+      log('新版下载接口调用已执行\n调用位置：window.external.MCPCBOX_VesionDownload\n版本标识：OnlineClientTest\n返回值：未读取\n\n请观察左下角“下载中心”是否出现任务，或界面是否自动切换。','ok');return;
+    }
+  }catch(e){log('新版下载接口调用异常\n结果：'+(e.message||String(e)),'err');return;}
+  log('新版下载接口不可用\n未找到 MCPCBOX_VesionDownload','err');
+}
+function testOldDownload(){
   var id=gid();
-  if(!confirm('将调用 MCPCBox_DownloadGameRes('+id+')。\n如果资源 ID 有效，盒子可能会开始下载。是否继续？')) return;
+  if(!confirm('这会调用旧 MCPCBox_DownloadGameRes('+id+')，可能弹出旧下载管理窗口。是否继续？')) return;
   try{
     if(window.external && typeof window.external.MCPCBox_DownloadGameRes!=='undefined'){
-      /* 重要：此 COM 方法的返回 VARIANT 是 IE JavaScript 不支持的 Automation 类型。
-         因此只执行调用，绝不读取/赋值返回值。 */
       window.external.MCPCBox_DownloadGameRes(id);
-      log('下载接口调用已执行\n调用位置：window.external.MCPCBox_DownloadGameRes\n资源 ID：'+id+'\n返回值：未读取（避免 Automation 类型错误）\n\n请观察盒子的“下载管理”窗口是否出现任务。','ok');
-      return;
+      log('旧下载接口调用已执行\n资源 ID：'+id+'\n返回值：未读取\n\n本按钮仅用于验证底层资源 XML，不作为最终方案。','ok');return;
     }
-  }catch(e){log('下载调用抛出异常\n结果：'+(e.message||String(e))+'\n\n如果“下载管理”已经弹出，说明原生调用实际上已经执行，只是 COM 返回值/后续处理产生异常。','err');return;}
-  log('下载接口调用失败\n未找到 MCPCBox_DownloadGameRes','err');
+  }catch(e){log('旧下载接口调用异常\n结果：'+(e.message||String(e)),'err');return;}
+  log('旧下载接口不可用','err');
 }
 window.onload=function(){document.getElementById('rid').innerText=gid();};
 </script>
 </head>
 <body>
 <div class="wrap">
- <a class="back" href="index.html">← 返回服务器列表</a>
+ <a class="back" href="index.html?v=6">← 返回服务器列表</a>
  <div class="title">联机客户端桥接测试</div>
  <div class="box">
   <div class="row"><span class="label">服务器状态：</span><span class="status">测试条目</span></div>
-  <div class="row"><span class="label">客户端资源 ID：</span><span id="rid">1</span></div>
-  <div class="row warn">资源 ID 1 目前只是占位测试 ID。下载管理能弹出代表 DownloadGameRes 桥接已通，不代表这个 ID 存在真实客户端。</div>
+  <div class="row"><span class="label">客户端资源 ID：</span><span id="rid">2</span></div>
+  <div class="row"><span class="label">版本标识：</span><span class="status">OnlineClientTest</span></div>
+  <div class="row warn">优先测试“新版下载中心调用”。旧下载管理按钮只保留用于诊断，不是最终流程。</div>
   <button class="btn btn2" onclick="checkBridge()">检测客户端下载桥接</button>
-  <button class="btn" onclick="testDownload()">测试下载调用</button>
-  <div id="log" class="log">请先点击“检测客户端下载桥接”。</div>
+  <button class="btn" onclick="testNewDownload()">新版下载中心调用</button>
+  <button class="btn btn2" onclick="testOldDownload()">旧下载调用（诊断）</button>
+  <div id="log" class="log">请先点击“新版下载中心调用”。</div>
  </div>
 </div>
 </body>
